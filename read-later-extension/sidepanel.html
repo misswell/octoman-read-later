@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Read Later - 侧面板</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container sidepanel-container">
+    <header>
+      <h1 id="panelTitle">📖 Read Later</h1>
+      <div class="header-actions">
+        <button id="toggleTrashBtn" class="btn-icon" title="回收站">🗑️</button>
+        <button id="addCurrentPage" class="btn-icon" title="添加当前页面">➕</button>
+      </div>
+    </header>
+
+    <!-- 误删恢复条 -->
+    <div id="undoBar" class="undo-bar">
+      <span class="undo-text">已删除</span>
+      <div class="undo-progress-track">
+        <div id="undoProgress" class="undo-progress"></div>
+      </div>
+      <button id="undoBtn" class="btn-undo">恢复</button>
+    </div>
+
+    <div id="listSection" class="list-section">
+      <div class="list-header">
+        <h2 id="listTitle">待办列表</h2>
+        <button id="deleteAllBtn" class="btn-danger-text" title="清空列表">清空</button>
+      </div>
+      <div id="listContainer" class="list-container"></div>
+    </div>
+
+    <div id="trashSection" class="list-section">
+      <div class="list-header">
+        <h2>回收站</h2>
+        <button id="emptyTrashBtn" class="btn-danger-text" title="清空回收站">清空回收站</button>
+      </div>
+      <div id="trashContainer" class="list-container"></div>
+    </div>
+
+    <div id="emptyState" class="empty-state">
+      <div class="empty-icon">📋</div>
+      <p id="emptyText">暂无待办页面</p>
+      <p class="hint" id="emptyHint">点击上方 ➕ 添加当前页面</p>
+    </div>
+
+    <div id="loadingState" class="loading-state">
+      <p>加载中...</p>
+    </div>
+  </div>
+  <script src="sidepanel.js" type="module"></script>
+</body>
+</html>
