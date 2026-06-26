@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Octoman Read Later",
   "version": "1.0",
-  "description": "Octoman Read Later - 保存当前页面到待办列表，支持管理、编辑和删除",
+  "description": "One-click save any page to read later. Organize your reading list, edit notes, restore from trash. / 一键保存页面稍后阅读。整理清单、编辑备注、回收站恢复。",
   "permissions": [
     "storage",
     "tabs",
