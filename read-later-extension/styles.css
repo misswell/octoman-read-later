@@ -42,8 +42,8 @@ body {
 }
 
 .popup-container {
-  min-height: 380px;
   width: 360px;
+  min-height: 380px;
   max-height: 460px;
   overflow: hidden;
 }
@@ -196,7 +196,7 @@ header h1 {
   padding: 7px 10px;
   margin-bottom: 5px;
   box-shadow: var(--card-shadow);
-  transition: box-shadow var(--transition), transform var(--transition);
+  transition: box-shadow var(--transition), opacity var(--transition);
   cursor: default;
 }
 
@@ -282,6 +282,61 @@ header h1 {
 .card-url:hover {
   color: var(--primary-hover);
   text-decoration: underline;
+}
+
+/* ========== Pending Delete (原地倒计时置灰) ========== */
+.card-pending-delete {
+  opacity: 0.45;
+  background: var(--bg-secondary);
+}
+
+.card-pending-delete .card-title {
+  text-decoration: line-through;
+  text-decoration-color: var(--text-secondary);
+  color: var(--text-secondary);
+}
+
+.card-pending-delete .card-url {
+  color: var(--text-secondary);
+  pointer-events: none;
+  text-decoration: line-through;
+}
+
+/* 倒计时中的操作按钮始终可见 */
+.card-pending-delete .card-actions {
+  opacity: 1;
+}
+
+.btn-countdown {
+  background: rgba(255, 107, 107, 0.12);
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--danger);
+  cursor: default;
+  line-height: 1.2;
+  min-width: 30px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.btn-restore {
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 2px 5px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all var(--transition);
+  color: var(--text-secondary);
+  line-height: 1;
+}
+
+.btn-restore:hover {
+  background: rgba(91, 124, 250, 0.1);
+  color: var(--primary);
 }
 
 /* ========== Empty & Loading ========== */
@@ -416,6 +471,31 @@ header h1 {
   transform: translateX(-50%) translateY(0);
 }
 
+/* ========== Inline Edit ========== */
+.inline-edit-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font);
+  color: var(--text);
+  background: var(--card-bg);
+  border: 1.5px solid var(--primary);
+  border-radius: 4px;
+  padding: 1px 4px;
+  outline: none;
+  box-shadow: 0 0 0 2px var(--primary-light);
+  line-height: 1.3;
+}
+
+/* ========== Trash card meta ========== */
+.card-meta {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  opacity: 0.6;
+}
+
 /* ========== Animations ========== */
 @keyframes fadeIn {
   from { opacity: 0; }
@@ -443,107 +523,4 @@ header h1 {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-secondary);
-}
-
-/* ========== Undo Bar ========== */
-.undo-bar {
-  display: none;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  background: rgba(40, 40, 45, 0.95);
-  color: white;
-  font-size: 12px;
-  backdrop-filter: blur(8px);
-  animation: slideDown 0.25s ease;
-}
-
-.undo-bar.show {
-  display: flex;
-}
-
-.undo-text {
-  flex-shrink: 0;
-  font-weight: 500;
-}
-
-.undo-progress-track {
-  flex: 1;
-  height: 3px;
-  background: rgba(255,255,255,0.2);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.undo-progress {
-  height: 100%;
-  background: rgba(255,255,255,0.6);
-  border-radius: 2px;
-  width: 100%;
-}
-
-.btn-undo {
-  flex-shrink: 0;
-  background: none;
-  border: 1px solid rgba(255,255,255,0.4);
-  color: white;
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition);
-}
-
-.btn-undo:hover {
-  background: rgba(255,255,255,0.15);
-  border-color: rgba(255,255,255,0.7);
-}
-
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* ========== Trash card meta ========== */
-.card-meta {
-  font-size: 10px;
-  color: var(--text-secondary);
-  margin-top: 2px;
-  opacity: 0.6;
-}
-
-/* ========== Restore button ========== */
-.btn-restore {
-  background: none;
-  border: none;
-  border-radius: var(--radius-sm);
-  padding: 2px 5px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all var(--transition);
-  color: var(--text-secondary);
-  line-height: 1;
-}
-
-.btn-restore:hover {
-  background: rgba(91, 124, 250, 0.1);
-  color: var(--primary);
-}
-
-/* ========== Inline Edit ========== */
-.inline-edit-input {
-  flex: 1;
-  min-width: 0;
-  font-size: 13px;
-  font-weight: 600;
-  font-family: var(--font);
-  color: var(--text);
-  background: var(--card-bg);
-  border: 1.5px solid var(--primary);
-  border-radius: 4px;
-  padding: 1px 4px;
-  outline: none;
-  box-shadow: 0 0 0 2px var(--primary-light);
-  line-height: 1.3;
 }

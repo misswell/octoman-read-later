@@ -2,8 +2,6 @@
 
 import { sendMessage, getCurrentTab, formatDate, truncateUrl } from './shared.js';
 
-let undoTimeout = null;
-let undoItem = null;
 let showingTrash = false;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -21,8 +19,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const toggleTrashBtn = document.getElementById('toggleTrashBtn');
   const panelTitle = document.getElementById('panelTitle');
   const listTitle = document.getElementById('listTitle');
-  const undoBar = document.getElementById('undoBar');
-  const undoBtn = document.getElementById('undoBtn');
   const openSidePanelBtn = document.getElementById('openSidePanel');
 
   await loadList();
@@ -84,21 +80,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       showToast('回收站已清空');
       await loadTrash();
     }
-  });
-
-  // 恢复按钮
-  undoBtn.addEventListener('click', async () => {
-    if (!undoItem) return;
-    clearUndo();
-    const result = await sendMessage('RESTORE_ITEM', { id: undoItem.id });
-    if (result.success) {
-      showToast('✅ 已恢复');
-      if (showingTrash) await loadTrash();
-      else await loadList();
-    } else {
-      showToast('❌ 恢复失败');
-    }
-    undoItem = null;
   });
 
   async function toggleView() {
@@ -219,11 +200,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     deleteBtn.className = 'btn-sm btn-delete';
     deleteBtn.textContent = '🗑️';
     deleteBtn.title = '删除';
+    // 单条删除：立即移至回收站，无需确认
     deleteBtn.addEventListener('click', async () => {
       const result = await sendMessage('DELETE_ITEM', { id: item.id });
       if (result.success) {
-        showUndoBar(item);
+        showToast('已移至回收站');
         await loadList();
+      } else {
+        showToast('❌ 删除失败');
       }
     });
 
@@ -308,33 +292,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     return card;
   }
 
-  function showUndoBar(item) {
-    clearUndo();
-    undoItem = item;
-    undoBar.classList.add('show');
-
-    const progress = document.getElementById('undoProgress');
-    progress.style.width = '100%';
-    progress.style.transition = 'none';
-    progress.offsetHeight;
-    progress.style.transition = 'width 10s linear';
-    progress.style.width = '0%';
-
-    undoTimeout = setTimeout(() => {
-      undoBar.classList.remove('show');
-      undoItem = null;
-      undoTimeout = null;
-    }, 10000);
-  }
-
-  function clearUndo() {
-    if (undoTimeout) {
-      clearTimeout(undoTimeout);
-      undoTimeout = null;
-    }
-    undoBar.classList.remove('show');
-  }
-
   function startInlineEdit(titleEl, item) {
     const input = document.createElement('input');
     input.className = 'inline-edit-input';
@@ -359,7 +316,6 @@ document.addEventListener('DOMContentLoaded', async () => {
           }
         }
       }
-      // restore
       titleEl.textContent = item.title;
       titleEl.style.display = '';
       input.remove();

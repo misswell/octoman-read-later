@@ -2,8 +2,6 @@
 
 import { sendMessage, getCurrentTab, formatDate, truncateUrl } from './shared.js';
 
-let undoTimeout = null;
-let undoItem = null;
 let showingTrash = false;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -21,8 +19,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   const toggleTrashBtn = document.getElementById('toggleTrashBtn');
   const panelTitle = document.getElementById('panelTitle');
   const listTitle = document.getElementById('listTitle');
-  const undoBar = document.getElementById('undoBar');
-  const undoBtn = document.getElementById('undoBtn');
 
   await loadList();
 
@@ -71,20 +67,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
-  undoBtn.addEventListener('click', async () => {
-    if (!undoItem) return;
-    clearUndo();
-    const result = await sendMessage('RESTORE_ITEM', { id: undoItem.id });
-    if (result.success) {
-      showToast('✅ 已恢复');
-      if (showingTrash) await loadTrash();
-      else await loadList();
-    } else {
-      showToast('❌ 恢复失败');
-    }
-    undoItem = null;
-  });
-
   async function toggleView() {
     showingTrash = !showingTrash;
     if (showingTrash) {
@@ -128,7 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     listSection.style.display = 'block';
     listTitle.textContent = '待办列表';
-    renderList(list, listContainer, false);
+    renderList(list);
   }
 
   async function loadTrash() {
@@ -159,11 +141,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderTrashList(list);
   }
 
-  function renderList(list, container, isTrash) {
-    container.innerHTML = '';
+  function renderList(list) {
+    listContainer.innerHTML = '';
     list.forEach(item => {
-      const card = createCard(item, isTrash);
-      container.appendChild(card);
+      const card = createCard(item);
+      listContainer.appendChild(card);
     });
   }
 
@@ -201,11 +183,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     deleteBtn.className = 'btn-sm btn-delete';
     deleteBtn.textContent = '🗑️';
     deleteBtn.title = '删除';
+    // 单条删除：立即移除至回收站，无需确认
     deleteBtn.addEventListener('click', async () => {
       const result = await sendMessage('DELETE_ITEM', { id: item.id });
       if (result.success) {
-        showUndoBar(item);
+        showToast('已删除，可在回收站恢复');
         await loadList();
+      } else {
+        showToast('❌ 删除失败');
       }
     });
 
@@ -279,7 +264,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const metaEl = document.createElement('div');
     metaEl.className = 'card-meta';
-    const deletedDate = new Date(item.deletedAt);
     const daysLeft = Math.max(0, 30 - Math.floor((Date.now() - item.deletedAt) / 86400000));
     metaEl.textContent = `删除于 ${formatDate(item.deletedAt)} · ${daysLeft}天后自动清除`;
 
@@ -288,33 +272,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     card.appendChild(metaEl);
 
     return card;
-  }
-
-  function showUndoBar(item) {
-    clearUndo();
-    undoItem = item;
-    undoBar.classList.add('show');
-
-    const progress = document.getElementById('undoProgress');
-    progress.style.width = '100%';
-    progress.style.transition = 'none';
-    progress.offsetHeight;
-    progress.style.transition = 'width 10s linear';
-    progress.style.width = '0%';
-
-    undoTimeout = setTimeout(() => {
-      undoBar.classList.remove('show');
-      undoItem = null;
-      undoTimeout = null;
-    }, 10000);
-  }
-
-  function clearUndo() {
-    if (undoTimeout) {
-      clearTimeout(undoTimeout);
-      undoTimeout = null;
-    }
-    undoBar.classList.remove('show');
   }
 
   function startInlineEdit(titleEl, item) {
